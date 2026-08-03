@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What are the hospital's visiting hours?",
+    "answer": "Visiting hours are from 10:00 AM to 12:00 PM and 4:00 PM to 6:00 PM every day."
+  },
+  {
+    "question": "Do you accept insurance?",
+    "answer": "Yes, we accept most major insurance providers. Please bring your insurance card and ID at the time of your visit."
+  },
+  {
+    "question": "How do I get a copy of my medical records?",
+    "answer": "You can request your medical records at the front desk or through the patient portal. Processing usually takes 3-5 business days."
+  },
+  {
+    "question": "What should I bring for my first appointment?",
+    "answer": "Please bring a valid photo ID, your insurance card, and a list of any current medications."
+  },
+  {
+    "question": "Is parking available at the hospital?",
+    "answer": "Yes, free parking is available in the visitor lot located at the main entrance."
+  },
+  {
+    "question": "How can I pay my hospital bill?",
+    "answer": "Bills can be paid online through the patient portal, by phone, or in person at the billing office."
+  },
+  {
+    "question": "What departments are available at this hospital?",
+    "answer": "We have Cardiology, Dermatology, General Medicine, Orthopedics, Pediatrics, and Emergency Care departments."
+  },
+  {
+    "question": "Can I get a same-day appointment?",
+    "answer": "Same-day appointments are subject to availability. Please call the front desk or use the chatbot to check current slots."
+  },
+  {
+    "question": "How do I cancel or reschedule my appointment?",
+    "answer": "You can cancel or reschedule an appointment through this chatbot, the patient portal, or by calling the front desk at least 24 hours in advance."
+  },
+  {
+    "question": "What is the process for a prescription refill?",
+    "answer": "You can request a refill through this chatbot or the patient portal. All refill requests are reviewed and approved by a licensed pharmacist."
+  },
+  {
+    "question": "Are telehealth/video consultations available?",
+    "answer": "Yes, telehealth consultations are available for select departments. You can request one when booking an appointment."
+  },
+  {
+    "question": "What are the emergency room hours?",
+    "answer": "The Emergency Room is open 24/7, every day of the year."
+  },
+  {
+    "question": "How do I update my personal or insurance information?",
+    "answer": "You can update your personal and insurance details through the patient portal or by visiting the registration desk."
+  },
+  {
+    "question": "Can the chatbot give me medical advice?",
+    "answer": "No. This chatbot handles appointments, prescriptions, and general information only. For medical advice or symptoms, you'll be connected to a healthcare professional."
+  },
+  {
+    "question": "How do I contact a specific doctor's office directly?",
+    "answer": "You can find a doctor's department contact info via this chatbot's 'find doctor' feature, or check the patient portal directory."
+  }
+]
