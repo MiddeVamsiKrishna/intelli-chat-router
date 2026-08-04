@@ -1,0 +1,8 @@
+{
+  "RX-03AEDC": {
+    "patient_id": "PID-9981",
+    "medication": "Metformin",
+    "status": "Pending pharmacist approval",
+    "created_at": "2026-08-04T11:29:19.129134"
+  }
+}

@@ -1,26 +1,58 @@
 """
 tools/tools.py
 
-Dummy (placeholder) tool functions for the Healthcare Support Chatbot.
-These simulate real backend actions (appointments, prescriptions, doctor lookup)
-with mock/fake data. Real logic (DB calls, external APIs) will be added on Day 3.
+Real tool functions for the Healthcare Support Chatbot.
+Unlike Day 1's dummy versions, these persist data to local JSON files
+acting as a lightweight mock database — good enough for a prototype,
+no real DB server needed.
 
-Each function:
-- Takes structured arguments extracted by the intent/LLM layer
-- Returns a dict with a "status" and a "message" (and any relevant data)
-  so the response layer can turn it into a natural-language reply.
+Each function still returns a dict with "status" and "message" so the
+response layer can turn it into a natural-language reply.
 """
 
-from datetime import datetime
-import random
+import json
+import os
 import uuid
+from datetime import datetime
+
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+APPOINTMENTS_FILE = os.path.join(DATA_DIR, "appointments.json")
+REFILLS_FILE = os.path.join(DATA_DIR, "refills.json")
+ESCALATIONS_FILE = os.path.join(DATA_DIR, "escalations.json")
+
+
+def _ensure_data_dir():
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+
+def _load_json(filepath):
+    _ensure_data_dir()
+    if not os.path.exists(filepath):
+        return {}
+    with open(filepath, "r") as f:
+        return json.load(f)
+
+
+def _save_json(filepath, data):
+    _ensure_data_dir()
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=2)
 
 
 def book_appointment(patient_name: str, department: str, date: str) -> dict:
-    """
-    Book a new appointment for a patient with a given department on a given date.
-    """
+    """Book a new appointment and persist it to appointments.json."""
+    appointments = _load_json(APPOINTMENTS_FILE)
     appointment_id = f"APT-{uuid.uuid4().hex[:6].upper()}"
+
+    appointments[appointment_id] = {
+        "patient_name": patient_name,
+        "department": department,
+        "date": date,
+        "status": "Confirmed",
+        "created_at": datetime.now().isoformat(),
+    }
+    _save_json(APPOINTMENTS_FILE, appointments)
+
     return {
         "status": "success",
         "tool": "book_appointment",
@@ -33,46 +65,64 @@ def book_appointment(patient_name: str, department: str, date: str) -> dict:
 
 
 def cancel_appointment(appointment_id: str) -> dict:
-    """
-    Cancel or reschedule an existing appointment by ID.
-    """
-    # Dummy logic: randomly simulate found/not found
-    if appointment_id.startswith("APT-"):
+    """Cancel an existing appointment by ID."""
+    appointments = _load_json(APPOINTMENTS_FILE)
+
+    if appointment_id not in appointments:
         return {
-            "status": "success",
+            "status": "error",
             "tool": "cancel_appointment",
-            "appointment_id": appointment_id,
-            "message": f"Appointment {appointment_id} has been cancelled successfully.",
+            "message": f"Could not find appointment with ID {appointment_id}.",
         }
+
+    appointments[appointment_id]["status"] = "Cancelled"
+    _save_json(APPOINTMENTS_FILE, appointments)
+
     return {
-        "status": "error",
+        "status": "success",
         "tool": "cancel_appointment",
-        "message": f"Could not find appointment with ID {appointment_id}.",
+        "appointment_id": appointment_id,
+        "message": f"Appointment {appointment_id} has been cancelled successfully.",
     }
 
 
 def check_appointment_status(appointment_id: str) -> dict:
-    """
-    Check the status of an existing appointment.
-    """
-    dummy_statuses = ["Confirmed", "Pending", "Completed", "Cancelled"]
-    status = random.choice(dummy_statuses)
+    """Check the real status of an existing appointment."""
+    appointments = _load_json(APPOINTMENTS_FILE)
+
+    if appointment_id not in appointments:
+        return {
+            "status": "error",
+            "tool": "check_appointment_status",
+            "message": f"Could not find appointment with ID {appointment_id}.",
+        }
+
+    appt = appointments[appointment_id]
     return {
         "status": "success",
         "tool": "check_appointment_status",
         "appointment_id": appointment_id,
-        "appointment_status": status,
-        "message": f"Appointment {appointment_id} is currently '{status}'.",
+        "appointment_status": appt["status"],
+        "message": (
+            f"Appointment {appointment_id} ({appt['department']}, "
+            f"{appt['date']}) is currently '{appt['status']}'."
+        ),
     }
 
 
 def request_refill(patient_id: str, medication: str) -> dict:
-    """
-    Request a prescription refill for a given patient and medication.
-    NOTE: This is administrative only — it does NOT approve dosages or
-    give medical advice. A pharmacist/doctor must approve the refill.
-    """
+    """Request a prescription refill and persist it to refills.json."""
+    refills = _load_json(REFILLS_FILE)
     request_id = f"RX-{uuid.uuid4().hex[:6].upper()}"
+
+    refills[request_id] = {
+        "patient_id": patient_id,
+        "medication": medication,
+        "status": "Pending pharmacist approval",
+        "created_at": datetime.now().isoformat(),
+    }
+    _save_json(REFILLS_FILE, refills)
+
     return {
         "status": "success",
         "tool": "request_refill",
@@ -85,16 +135,15 @@ def request_refill(patient_id: str, medication: str) -> dict:
 
 
 def find_doctor(specialty: str) -> dict:
-    """
-    Find available doctors for a given specialty/department.
-    """
-    dummy_doctors = {
+    """Find available doctors for a given specialty/department (static lookup table)."""
+    doctors_directory = {
         "cardiology": ["Dr. A. Rao", "Dr. S. Mehta"],
         "dermatology": ["Dr. K. Iyer"],
         "general medicine": ["Dr. P. Sharma", "Dr. N. Gupta"],
         "orthopedics": ["Dr. R. Verma"],
+        "skin": ["Dr. K. Iyer"],  # alias for dermatology
     }
-    doctors = dummy_doctors.get(specialty.lower(), ["Dr. J. Smith (General)"])
+    doctors = doctors_directory.get(specialty.lower(), ["Dr. J. Smith (General)"])
     return {
         "status": "success",
         "tool": "find_doctor",
@@ -105,13 +154,16 @@ def find_doctor(specialty: str) -> dict:
 
 
 def escalate_to_human(reason: str = "medical query outside chatbot scope") -> dict:
-    """
-    Escalation tool — used whenever a user asks something the chatbot should
-    NOT answer directly (e.g. diagnosis, symptoms, medical advice, or any
-    request involving sensitive personal health information the bot can't verify).
-    This is an important safety guardrail for the healthcare domain.
-    """
+    """Escalate to a human, logging the escalation to escalations.json."""
+    escalations = _load_json(ESCALATIONS_FILE)
     ticket_id = f"ESC-{uuid.uuid4().hex[:6].upper()}"
+
+    escalations[ticket_id] = {
+        "reason": reason,
+        "created_at": datetime.now().isoformat(),
+    }
+    _save_json(ESCALATIONS_FILE, escalations)
+
     return {
         "status": "escalated",
         "tool": "escalate_to_human",
@@ -124,11 +176,27 @@ def escalate_to_human(reason: str = "medical query outside chatbot scope") -> di
     }
 
 
+# Maps intent names (from intent/router.py) to their corresponding tool function.
+# app.py will use this to call the right tool based on detected intent.
+TOOL_REGISTRY = {
+    "book_appointment": book_appointment,
+    "cancel_appointment": cancel_appointment,
+    "check_appointment_status": check_appointment_status,
+    "request_refill": request_refill,
+    "find_doctor": find_doctor,
+    "escalate_to_human": escalate_to_human,
+}
+
+
 if __name__ == "__main__":
-    # Quick manual smoke test
-    print(book_appointment("John Doe", "Cardiology", "2026-08-10"))
-    print(cancel_appointment("APT-123ABC"))
-    print(check_appointment_status("APT-123ABC"))
+    # Smoke test — also verifies data persists to tools/data/*.json
+    result = book_appointment("John Doe", "Cardiology", "2026-08-10")
+    print(result)
+    appt_id = result["appointment_id"]
+
+    print(check_appointment_status(appt_id))
+    print(cancel_appointment(appt_id))
     print(request_refill("PID-9981", "Metformin"))
     print(find_doctor("Cardiology"))
     print(escalate_to_human("Patient asked about chest pain symptoms"))
+    print(f"\nData persisted to: {DATA_DIR}")
