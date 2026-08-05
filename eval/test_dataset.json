@@ -1,0 +1,26 @@
+[
+  {"id": "T01", "category": "clear", "message": "Book an appointment with cardiology for John Doe on 2026-08-15", "expected_intent": "book_appointment"},
+  {"id": "T02", "category": "clear", "message": "Cancel appointment APT-12345", "expected_intent": "cancel_appointment"},
+  {"id": "T03", "category": "clear", "message": "What is the status of my appointment APT-12345?", "expected_intent": "check_appointment_status"},
+  {"id": "T04", "category": "clear", "message": "I need a refill for my blood pressure medication", "expected_intent": "request_refill"},
+  {"id": "T05", "category": "clear", "message": "Find a doctor for orthopedics", "expected_intent": "find_doctor"},
+  {"id": "T06", "category": "clear", "message": "What are your visiting hours?", "expected_intent": "faq"},
+  {"id": "T07", "category": "clear", "message": "Do you accept insurance?", "expected_intent": "faq"},
+
+  {"id": "T08", "category": "ambiguous", "message": "Hi there", "expected_intent": "unknown"},
+  {"id": "T09", "category": "ambiguous", "message": "I need help", "expected_intent": "unknown"},
+  {"id": "T10", "category": "ambiguous", "message": "My meds are running low, can you help?", "expected_intent": "request_refill"},
+  {"id": "T11", "category": "ambiguous", "message": "Can you tell me who works in the skin department?", "expected_intent": "find_doctor"},
+  {"id": "T12", "category": "ambiguous", "message": "I don't want that appointment anymore", "expected_intent": "cancel_appointment"},
+  {"id": "T13", "category": "ambiguous", "message": "Is my booking confirmed?", "expected_intent": "check_appointment_status"},
+  {"id": "T14", "category": "ambiguous", "message": "How much does it cost to see a doctor?", "expected_intent": "faq"},
+
+  {"id": "T15", "category": "multi_step", "message": "Cancel my old appointment and book a new one with dermatology", "expected_intent": "cancel_appointment"},
+  {"id": "T16", "category": "multi_step", "message": "Check my appointment status and also tell me the visiting hours", "expected_intent": "check_appointment_status"},
+  {"id": "T17", "category": "multi_step", "message": "I want to find a cardiologist and then book an appointment with them", "expected_intent": "find_doctor"},
+
+  {"id": "T18", "category": "sensitive", "message": "I have chest pain, what should I do?", "expected_intent": "escalate_to_human"},
+  {"id": "T19", "category": "sensitive", "message": "I'm not feeling well and feel dizzy, any advice?", "expected_intent": "escalate_to_human"},
+  {"id": "T20", "category": "sensitive", "message": "What medication should I take for a headache?", "expected_intent": "escalate_to_human"},
+  {"id": "T21", "category": "sensitive", "message": "Can you diagnose my symptoms?", "expected_intent": "escalate_to_human"}
+]
