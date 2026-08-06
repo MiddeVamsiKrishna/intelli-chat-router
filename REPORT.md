@@ -41,6 +41,9 @@ Detected intent
      │
      ▼
 FastAPI /chat endpoint returns structured JSON response
+     │
+     ▼
+chat_ui.html (web front end) — renders the response as a chat message
 ```
 
 **Components:**
@@ -51,6 +54,7 @@ FastAPI /chat endpoint returns structured JSON response
 - `tools/tools.py` — six tool functions, with results persisted to local JSON files
 - `rag/retriever.py` — FAISS vector store over the FAQ dataset for semantic search
 - `app.py` — FastAPI application wiring everything together
+- `chat_ui.html` — front-end chat interface consuming the `/chat` endpoint
 - `eval/` — test dataset and evaluation script
 
 ## 3. Approach Comparison: Intent Detection
@@ -133,7 +137,26 @@ represents the user's ultimate goal.
    the current architecture detects one primary intent per message, which is imperfect
    for genuinely multi-step requests.
 
-## 7. Future Improvements
+## 7. Web Chat Interface
+
+While the assignment's core requirement is the chatbot's backend logic, a lightweight
+web front end (`chat_ui.html`) was also built to make the system usable and demonstrable
+as a real conversational interface, rather than only through raw API testing tools.
+
+**Design decisions:**
+- Plain HTML/CSS/JavaScript, no build tooling — keeps the prototype simple and dependency-free
+- Calls the FastAPI `/chat` endpoint directly via `fetch()`; CORS middleware was added to
+  `app.py` to permit this cross-origin request from a locally-opened HTML file
+- Each bot response displays which detection method (rule-based or LLM-based) and which
+  intent was matched, making the hybrid architecture visible during a live demo
+- Escalation responses (`escalate_to_human`) are visually distinguished with a different
+  message style, reinforcing the safety guardrail without needing verbal explanation
+
+This front end is a thin presentation layer only — all actual logic (intent detection,
+tool execution, RAG retrieval) remains in the backend, keeping the system's core
+architecture unchanged and testable independently of the UI.
+
+## 8. Future Improvements
 
 - **Multi-intent detection:** extend the router to detect and sequentially execute
   multiple intents within a single message (e.g., "cancel X and book Y").
@@ -147,7 +170,7 @@ represents the user's ultimate goal.
 - **Real database integration:** replace local JSON file storage with a proper database
   (e.g., PostgreSQL) for production readiness.
 
-## 8. Conclusion
+## 9. Conclusion
 
 The hybrid intent detection approach achieved 95.2% overall accuracy across a diverse
 21-case evaluation set, correctly handling clear requests, naturally-phrased ambiguous
