@@ -15,6 +15,7 @@ Then visit http://127.0.0.1:8000/docs for the interactive API tester.
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from intent.router import detect_intent
@@ -26,6 +27,14 @@ app = FastAPI(
     title="Healthcare Support Chatbot API",
     description="AI chatbot with intelligent tool selection for a healthcare helpdesk domain.",
     version="1.0.0",
+)
+
+# Allow the chat UI (opened as a local HTML file or from a dev server) to call this API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
